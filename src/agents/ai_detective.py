@@ -180,16 +180,22 @@ class AIDetective:
         
         score = 50.0  # Base score
         
-        # Mood matching
+        # Mood matching - use set to prevent duplicate genre bonuses
         preferred_genres = mood_analysis.get("preferred_genres", [])
         avoid_genres = mood_analysis.get("avoid_genres", [])
         content_genres = content.get("genre", [])
         
+        # Track which preferred genres we've already scored
+        scored_preferred = False
+        scored_avoided = False
+        
         for genre in content_genres:
-            if any(pg.lower() in genre.lower() for pg in preferred_genres):
+            if not scored_preferred and any(pg.lower() in genre.lower() for pg in preferred_genres):
                 score += 15
-            if any(ag.lower() in genre.lower() for ag in avoid_genres):
+                scored_preferred = True
+            if not scored_avoided and any(ag.lower() in genre.lower() for ag in avoid_genres):
                 score -= 20
+                scored_avoided = True
         
         # Duration matching
         min_dur, max_dur = context_analysis["recommended_duration_range"]

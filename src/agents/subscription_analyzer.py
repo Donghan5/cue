@@ -63,6 +63,18 @@ class SubscriptionAnalyzer:
             }
         }
     
+    def _normalize_service_name(self, service_name: str) -> str:
+        """
+        Normalize service name for consistent lookup
+        
+        Args:
+            service_name: Original service name
+            
+        Returns:
+            Normalized service name (lowercase with underscores)
+        """
+        return service_name.lower().replace(" ", "_")
+    
     def analyze_subscriptions(self, subscriptions: List[Subscription]) -> Dict:
         """
         Analyze user subscriptions to determine available content
@@ -84,7 +96,7 @@ class SubscriptionAnalyzer:
             available_content_types.update(sub.content_types)
             available_services.append(sub.service_name)
             
-            service_info = self.service_catalog.get(sub.service_name.lower().replace(" ", "_"), {})
+            service_info = self.service_catalog.get(self._normalize_service_name(sub.service_name), {})
             service_details.append({
                 "name": sub.service_name,
                 "content_types": [ct.value for ct in sub.content_types],
